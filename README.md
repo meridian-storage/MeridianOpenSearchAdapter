@@ -2,12 +2,107 @@
 
 # Meridian OpenSearch Adapter
 
-`meridian-storage-opensearch` is the independently released Meridian V1 adapter for
-eventually consistent `structured` Catalog search projections on OpenSearch.
+`meridian-storage-opensearch` is the independently released Meridian V1 adapter for eventually
+consistent `structured` Catalog search projections on OpenSearch. It is one Python distribution
+in one public Apache-2.0 repository.
 
-The adapter owns OpenSearch translation, mappings, analyzers, indexing behavior, aliases,
-health probes, and normalized failures. It does not provision clusters, expose OpenSearch DSL,
-or provide authoritative document CRUD. Platform or Vangu IaC owns engine selection,
-credentials, topology, migration execution, recovery, and lifecycle.
+## Capabilities
 
-Implementation and release evidence are being completed under Feishu task `[02m-07]`.
+The sole operation surface is `meridian.structured.search@1.0.0`. The adapter provides:
+
+- closed, fingerprinted mappings for full-text and declared document-path projections;
+- unrestricted BCP 47 language metadata with ICU fallback, with English and Chinese initial
+  conformance;
+- deterministic document identities, externally versioned upserts, tombstones, and bounded bulk
+  partial outcomes;
+- mapping-first Query V1 translation for the released logical operator allowlist;
+- mandatory tenant/scope, Resource, and tombstone filters;
+- signed `search_after` cursors, plus deployment-conditional point-in-time cursors;
+- logical `RecordRef` results, bounded facets/highlights, and fail-closed partial-search handling;
+- explicit generation create/verify/activate/rollback/retire hooks with atomic alias cutover; and
+- authenticated engine, ICU plugin, topology, health, alias, analyzer, replica, and mapping probes.
+
+The exact capability manifest, supported engine patch releases, and hard limits are available from
+`adapter_descriptor()`, `capability_manifest()`, and `query_capabilities()`.
+
+## Install
+
+```console
+python -m pip install meridian-storage-opensearch==1.0.0
+```
+
+The distribution requires the released Meridian Core, Query, and Semantics packages at exactly
+`1.0.0`. Artifact hashes and locked design revisions are recorded in
+[`compatibility.json`](compatibility.json).
+
+## Configure through a Meridian Binding
+
+Platform or Vangu IaC supplies the endpoint or service reference, secret references, compiled
+layouts, topology expectations, and exact capability fingerprint. Credentials never belong in an
+endpoint URL or settings document.
+
+```json
+{
+  "adapterId": "org.meridian.storage.opensearch",
+  "engineProfile": "opensearch",
+  "engineVersion": "2.19.1",
+  "serviceRef": "platform://search/case-index",
+  "physicalNamespace": "meridian",
+  "requiredCapabilityFingerprint": "sha256:<64 hex characters>",
+  "settings": {
+    "indexPrefix": "meridian",
+    "layouts": {
+      "structured:investigation.articles": {
+        "formatVersion": "meridian.opensearch.layout.v1"
+      }
+    },
+    "requiredPlugins": ["analysis-icu"],
+    "pitEnabled": true
+  }
+}
+```
+
+`layouts` must contain the complete value returned by `MappingCompiler.compile(...).to_dict()`;
+the abbreviated object above only illustrates placement. Use
+`expected_capability_fingerprint(engine_version, settings)` when producing the Binding pin.
+
+## Projection and search APIs
+
+Adapter-internal projection workers use `ProjectionExecutor` with an IaC-selected write alias.
+Consumers do not receive this object and never see aliases, index names, mappings, analyzers, or
+OpenSearch DSL. Consumers submit released mapping-first Expressions or serialized Operations
+through Meridian Core.
+
+The projection is always derived and eventually consistent. A successful authoritative write does
+not imply immediate search visibility. `refresh=wait_for` is available to controlled projection
+and conformance workflows; it is not an authoritative transaction guarantee.
+
+## Ownership boundary
+
+This package owns translation, mappings, analysis definitions, indexing requests, cursor behavior,
+generation hooks, probes, and redacted engine-failure normalization. It does not create a Search or
+Projection Catalog and does not expose native queries, regex, wildcard/query-string syntax, scripts,
+credentials, endpoints, or physical lifecycle details.
+
+Platform/Vangu IaC owns engine selection, provisioning/reference, state, identity and ACLs,
+migration orchestration, recovery, and lifecycle. See [architecture](docs/architecture.md),
+[migrations](docs/migrations.md), and the [failure model](docs/failure-model.md).
+
+## Verify
+
+```console
+python -m pytest -q tests/unit tests/contract tests/packaging
+./scripts/run-single-conformance.sh
+./scripts/run-cluster-conformance.sh
+python -m build
+python scripts/verify_artifacts.py dist
+```
+
+The Docker harness pins OpenSearch 2.19.1 by digest and installs its matching `analysis-icu`
+plugin. Cluster conformance uses three eligible/data nodes, one replica, green-health verification,
+and a deliberate node loss. See [conformance evidence](docs/conformance.md).
+
+## License and security
+
+Licensed under the Apache License 2.0. See [LICENSE](LICENSE), [NOTICE](NOTICE), and
+[SECURITY.md](SECURITY.md).

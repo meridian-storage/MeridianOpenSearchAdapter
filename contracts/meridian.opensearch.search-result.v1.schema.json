@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://meridian.org/contracts/opensearch/meridian.opensearch.search-result.v1.schema.json",
+  "title": "Meridian OpenSearch Normalized Search Result V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["items", "facets", "total", "consistency", "cursor"],
+  "properties": {
+    "items": {
+      "type": "array",
+      "maxItems": 500,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["recordRef", "sourceVersion", "sourceSequence", "score", "sort", "highlights"],
+        "properties": {
+          "recordRef": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["collectionRef", "recordId"],
+            "properties": {
+              "collectionRef": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["catalog", "namespace", "name"],
+                "properties": {
+                  "catalog": { "const": "structured" },
+                  "namespace": { "type": "string", "minLength": 1 },
+                  "name": { "type": "string", "minLength": 1 }
+                }
+              },
+              "recordId": true
+            }
+          },
+          "sourceVersion": { "type": "string", "minLength": 1 },
+          "sourceSequence": { "type": "integer", "minimum": 1 },
+          "score": { "type": ["number", "null"] },
+          "sort": { "type": "array", "minItems": 1 },
+          "highlights": { "type": "object" }
+        }
+      }
+    },
+    "facets": { "type": "object" },
+    "total": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "relation"],
+      "properties": {
+        "value": { "type": "integer", "minimum": 0 },
+        "relation": { "enum": ["eq", "gte"] }
+      }
+    },
+    "consistency": { "const": "eventual" },
+    "cursor": { "type": ["string", "null"] }
+  }
+}
