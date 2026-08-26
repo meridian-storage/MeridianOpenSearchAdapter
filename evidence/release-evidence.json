@@ -2,7 +2,7 @@
   "adapterVersion": "1.0.0",
   "artifacts": {
     "meridian_storage_opensearch-1.0.0-py3-none-any.whl": "2e39eaac03fa4e86c0ed66a1f4932bd3d859a9bb4a8e64e39fa7da9c52a6ff2b",
-    "meridian_storage_opensearch-1.0.0.tar.gz": "5a1df0302c31abae6e1a7c0a6738db501bc1f626f788276e8f75d1b1bdeace86"
+    "meridian_storage_opensearch-1.0.0.tar.gz": "75590b7debde2dff7fcce5aaddbde95ecddce692d1a84911be64353c98c1a6cc"
   },
   "compatibilitySha256": "ad55e36e39567c0ee6a6cca37a131b6bfc076a3d9b2ad8e409de04f54d90f6fb",
   "conformance": {
