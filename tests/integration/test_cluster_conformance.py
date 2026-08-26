@@ -60,6 +60,16 @@ def test_three_node_topology_replication_and_green_health(search_schema: SchemaD
         refresh_policy="wait_for",
     )
     assert result.outcome.value == "applied"
+    # Let OpenSearch converge for 30s and give the transport slightly longer to receive it.
+    health = client.cluster.health(
+        index=index,
+        wait_for_status="green",
+        wait_for_no_relocating_shards=True,
+        timeout="30s",
+        request_timeout=35,
+    )
+    assert health["timed_out"] is False
+    assert health["status"] == "green"
     snapshot = OpenSearchProbe(client, _settings(layout)).snapshot()
     assert snapshot.data_nodes >= 3
     assert snapshot.eligible_nodes >= 3
