@@ -1,0 +1,55 @@
+{
+  "formatVersion": "meridian.opensearch.conformance-suite.v1",
+  "lockedEngine": "OpenSearch 2.19.1",
+  "vectors": [
+    {
+      "formatVersion": "meridian.opensearch.conformance-vector.v1",
+      "id": "analysis.en-zh-future-icu",
+      "category": "analysis",
+      "input": {"languages": ["en", "zh", "ar"]},
+      "expected": {"en": "icu-plus-english-stemming", "zh": "icu", "ar": "icu-fallback"}
+    },
+    {
+      "formatVersion": "meridian.opensearch.conformance-vector.v1",
+      "id": "mapping.closed-hashed-fingerprinted",
+      "category": "mapping",
+      "input": {"profile": "search", "dynamic": "strict"},
+      "expected": {"logicalNamesExposed": false, "fingerprintsEmbedded": true}
+    },
+    {
+      "formatVersion": "meridian.opensearch.conformance-vector.v1",
+      "id": "projection.external-version-and-tombstone",
+      "category": "projection",
+      "input": {"newSequence": 10, "staleSequence": 9, "deleteSequence": 11},
+      "expected": {"new": "applied", "stale": "stale", "delete": "hidden-from-search"}
+    },
+    {
+      "formatVersion": "meridian.opensearch.conformance-vector.v1",
+      "id": "query.scope-and-logical-result",
+      "category": "query",
+      "input": {"sameTextAcrossScopes": true},
+      "expected": {"crossScopeHits": 0, "resultIdentity": "logical-record-ref"}
+    },
+    {
+      "formatVersion": "meridian.opensearch.conformance-vector.v1",
+      "id": "pagination.live-and-pit",
+      "category": "pagination",
+      "input": {"pageSize": 1, "modes": ["live-keyset", "point-in-time"]},
+      "expected": {"signed": true, "stableTieBreaker": true, "pitReused": true}
+    },
+    {
+      "formatVersion": "meridian.opensearch.conformance-vector.v1",
+      "id": "migration.atomic-alias-rollback-retire",
+      "category": "migration",
+      "input": {"generations": [1, 2]},
+      "expected": {"cutover": "atomic", "rollback": "generation-1", "retired": "generation-2"}
+    },
+    {
+      "formatVersion": "meridian.opensearch.conformance-vector.v1",
+      "id": "failure.node-loss-and-partials",
+      "category": "failure",
+      "input": {"clusterNodes": 3, "replicas": 1, "stoppedNodes": 1},
+      "expected": {"topologyProbe": "failed-closed", "replicaSearchFailedShards": 0, "partialSearch": "rejected"}
+    }
+  ]
+}

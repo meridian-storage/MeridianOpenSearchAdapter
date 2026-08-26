@@ -1,0 +1,99 @@
+# SPDX-License-Identifier: Apache-2.0
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  PYTHONHASHSEED: "0"
+
+jobs:
+  build-release:
+    name: Build, attest, and release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.2.2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Install hash-locked dependencies
+        run: python -m pip install --require-hashes -r requirements.lock
+      - name: Verify tag and choose reproducible epoch
+        run: |
+          tag_version="${GITHUB_REF_NAME#v}"
+          package_version="$(python -c 'from pathlib import Path; namespace = {}; exec(Path("src/meridian_storage/adapters/opensearch/_version.py").read_text(), namespace); print(namespace["__version__"])')"
+          test "${tag_version}" = "${package_version}"
+          echo "SOURCE_DATE_EPOCH=$(git show -s --format=%ct HEAD)" >> "${GITHUB_ENV}"
+      - name: Test and build reproducibly
+        run: |
+          python -m pip install --no-build-isolation --no-deps -e .
+          python -m pytest -q --cov=meridian_storage.adapters.opensearch --cov-branch \
+            tests/unit tests/contract tests/packaging
+          python scripts/verify_reproducible.py
+          python -m build
+          python -m twine check dist/*
+          python scripts/verify_artifacts.py dist
+          python scripts/generate_evidence.py dist evidence/release-evidence.json
+          sha256sum dist/* > dist/SHA256SUMS
+      - name: Generate SPDX SBOM
+        uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0.24.0
+        with:
+          path: dist
+          format: spdx-json
+          output-file: dist/meridian-storage-opensearch-1.0.0.spdx.json
+          upload-artifact: false
+      - name: Attest release bundle
+        uses: actions/attest-build-provenance@43d14bc2b83dec42d39ecae14e916627a18bb661 # v3.0.0
+        with:
+          subject-path: dist/*
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: release-bundle
+          path: |
+            dist/*
+            evidence/release-evidence.json
+          if-no-files-found: error
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: python-dist
+          path: |
+            dist/*.whl
+            dist/*.tar.gz
+          if-no-files-found: error
+      - name: Create public GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "${GITHUB_REF_NAME}" dist/* evidence/release-evidence.json
+          --verify-tag --generate-notes --title "meridian-storage-opensearch ${GITHUB_REF_NAME}"
+
+  publish-pypi:
+    name: Publish to PyPI after owner gate
+    needs: build-release
+    if: vars.PYPI_TRUSTED_PUBLISHING_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/meridian-storage-opensearch/
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: python-dist
+          path: dist
+      - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+        with:
+          packages-dir: dist
+          attestations: true

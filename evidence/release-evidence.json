@@ -1,0 +1,29 @@
+{
+  "adapterVersion": "1.0.0",
+  "artifacts": {
+    "meridian_storage_opensearch-1.0.0-py3-none-any.whl": "2e39eaac03fa4e86c0ed66a1f4932bd3d859a9bb4a8e64e39fa7da9c52a6ff2b",
+    "meridian_storage_opensearch-1.0.0.tar.gz": "5a1df0302c31abae6e1a7c0a6738db501bc1f626f788276e8f75d1b1bdeace86"
+  },
+  "compatibilitySha256": "ad55e36e39567c0ee6a6cca37a131b6bfc076a3d9b2ad8e409de04f54d90f6fb",
+  "conformance": {
+    "cluster": {
+      "dataNodes": 3,
+      "eligibleNodes": 3,
+      "nodeLoss": "probe-failed-closed-and-replica-search-succeeded",
+      "replicas": 1
+    },
+    "engine": "OpenSearch 2.19.1",
+    "imageDigest": "sha256:72fe2fc84be8295906b8efca020b46c58ed45c8da60cd9b8b49e1991e38e89a4",
+    "plugin": "analysis-icu 2.19.1",
+    "realEngineVectors": 3,
+    "unitContractPackagingTests": 118
+  },
+  "contracts": {
+    "meridian.opensearch.conformance-vector.v1.schema.json": "0e85c115056610d2294641312358f65a773f9b390df8f83e997a42eb11a0e015",
+    "meridian.opensearch.layout.v1.schema.json": "60ba8474ca91a01e791f0ed687dc3aff38f58b2f8dbcf3a0e581fd65dc690c14",
+    "meridian.opensearch.projection-mutation.v1.schema.json": "9f012eb2ec13d391a03e716fe8406282669c82f902273f235bef3613b744be5c",
+    "meridian.opensearch.search-result.v1.schema.json": "4557ef84fe355c96522e5da5a764d41035ea083825a5945e314c048ac4988bd0"
+  },
+  "formatVersion": "meridian.opensearch.release-evidence.v1",
+  "license": "Apache-2.0"
+}

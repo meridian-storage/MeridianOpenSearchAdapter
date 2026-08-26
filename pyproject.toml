@@ -1,0 +1,130 @@
+# SPDX-License-Identifier: Apache-2.0
+
+[build-system]
+requires = ["hatchling==1.27.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "meridian-storage-opensearch"
+dynamic = ["version"]
+description = "OpenSearch adapter for Meridian V1 multilingual search projections"
+readme = "README.md"
+requires-python = ">=3.12,<3.15"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+authors = [{ name = "Meridian contributors" }]
+keywords = ["adapter", "full-text", "meridian", "opensearch", "search"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Typing :: Typed",
+]
+dependencies = [
+  "meridian-storage-core==1.0.0",
+  "meridian-storage-query==1.0.0",
+  "meridian-storage-semantics==1.0.0",
+  "opensearch-py>=3.2,<4",
+]
+
+[project.optional-dependencies]
+test = [
+  "build>=1.2,<2",
+  "hatchling==1.27.0",
+  "hypothesis>=6.135,<7",
+  "jsonschema>=4.23,<5",
+  "mypy>=1.15,<2",
+  "packaging>=24,<27",
+  "pytest>=8.3,<10",
+  "pytest-cov>=6,<8",
+  "ruff>=0.11,<1",
+  "twine>=6,<7",
+]
+
+[project.entry-points."meridian_storage.adapters"]
+opensearch = "meridian_storage.adapters.opensearch:OpenSearchAdapterFactory"
+
+[project.urls]
+Documentation = "https://github.com/zephytiju/meridian-storage-opensearch#readme"
+Issues = "https://github.com/zephytiju/meridian-storage-opensearch/issues"
+Repository = "https://github.com/zephytiju/meridian-storage-opensearch"
+
+[tool.hatch.version]
+path = "src/meridian_storage/adapters/opensearch/_version.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "/CHANGELOG.md",
+  "/CONTRIBUTING.md",
+  "/RELEASING.md",
+  "/SECURITY.md",
+  "/compatibility.json",
+  "/contracts",
+  "/docs",
+  "/evidence",
+  "/LICENSE",
+  "/NOTICE",
+  "/pyproject.toml",
+  "/README.md",
+  "/requirements.lock",
+  "/scripts",
+  "/src",
+  "/tests",
+]
+exclude = ["/evidence/release-evidence.json"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/meridian_storage"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"compatibility.json" = "meridian_storage/adapters/opensearch/compatibility.json"
+"contracts" = "meridian_storage/adapters/opensearch/contracts"
+
+[tool.pytest.ini_options]
+addopts = "--strict-config --strict-markers -ra"
+pythonpath = ["src"]
+testpaths = ["tests"]
+markers = [
+  "cluster: requires a disposable three-node OpenSearch profile",
+  "conformance: exercises released Meridian contracts and deterministic vectors",
+  "integration: requires a real standalone OpenSearch server",
+  "packaging: verifies built distribution contents and metadata",
+  "relevance: validates multilingual relevance against a real OpenSearch analyzer",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["meridian_storage.adapters.opensearch"]
+
+[tool.coverage.report]
+fail_under = 90
+show_missing = true
+skip_covered = true
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unreachable = true
+packages = ["meridian_storage.adapters.opensearch"]
+mypy_path = "src"
+namespace_packages = true
+explicit_package_bases = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["A", "B", "C4", "E", "F", "I", "N", "PERF", "PIE", "PYI", "RUF", "S", "SIM", "UP"]
+ignore = ["S101"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S105", "S106", "S107"]
+
+[tool.ruff.format]
+quote-style = "double"

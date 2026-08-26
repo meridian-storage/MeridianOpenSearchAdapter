@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://meridian.org/contracts/opensearch/meridian.opensearch.projection-mutation.v1.schema.json",
+  "title": "Meridian OpenSearch Projection Mutation V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "formatVersion", "resourceRef", "recordId", "sourceSequence", "sourceVersion",
+    "schemaVersion", "schemaFingerprint", "scopeFingerprint", "eventId", "payload", "projectedAt"
+  ],
+  "properties": {
+    "formatVersion": { "const": "meridian.opensearch.projection-mutation.v1" },
+    "resourceRef": { "type": "string", "pattern": "^structured:" },
+    "recordId": {
+      "oneOf": [
+        { "type": ["string", "number", "integer", "boolean"] },
+        { "type": "array", "minItems": 1, "items": { "type": ["string", "number", "integer", "boolean"] } }
+      ]
+    },
+    "sourceSequence": { "type": "integer", "minimum": 1 },
+    "sourceVersion": { "type": "string", "minLength": 1 },
+    "schemaVersion": { "type": "string", "minLength": 1 },
+    "schemaFingerprint": { "$ref": "#/$defs/fingerprint" },
+    "scopeFingerprint": { "$ref": "#/$defs/fingerprint" },
+    "eventId": { "type": "string", "minLength": 1 },
+    "payload": { "type": ["object", "null"] },
+    "projectedAt": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "fingerprint": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  }
+}

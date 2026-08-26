@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://meridian.org/contracts/opensearch/meridian.opensearch.conformance-vector.v1.schema.json",
+  "title": "Meridian OpenSearch Conformance Vector V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["formatVersion", "id", "category", "input", "expected"],
+  "properties": {
+    "formatVersion": { "const": "meridian.opensearch.conformance-vector.v1" },
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]+$" },
+    "category": {
+      "enum": ["analysis", "mapping", "projection", "query", "pagination", "migration", "failure"]
+    },
+    "input": true,
+    "expected": true
+  }
+}
