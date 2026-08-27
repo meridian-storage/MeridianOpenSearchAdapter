@@ -50,9 +50,9 @@ test = [
 opensearch = "meridian_storage.adapters.opensearch:OpenSearchAdapterFactory"
 
 [project.urls]
-Documentation = "https://github.com/zephytiju/meridian-storage-opensearch#readme"
-Issues = "https://github.com/zephytiju/meridian-storage-opensearch/issues"
-Repository = "https://github.com/zephytiju/meridian-storage-opensearch"
+Documentation = "https://github.com/zephytiju/MeridianOpenSearchAdapter#readme"
+Issues = "https://github.com/zephytiju/MeridianOpenSearchAdapter/issues"
+Repository = "https://github.com/zephytiju/MeridianOpenSearchAdapter"
 
 [tool.hatch.version]
 path = "src/meridian_storage/adapters/opensearch/_version.py"
