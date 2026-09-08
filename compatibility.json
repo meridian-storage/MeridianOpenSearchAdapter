@@ -1,30 +1,27 @@
 {
   "formatVersion": "meridian.opensearch.compatibility.v1",
-  "adapterVersion": "1.0.0",
+  "adapterVersion": "1.1.0",
   "lockedDesigns": {
     "meridianHldRevision": 56,
     "catalogsAndPublicInterfacesRevision": 70,
     "engineAdaptersRevision": 24,
-    "openSearchLldRevision": 12
+    "openSearchLldRevision": 32
   },
   "releasedDependencies": {
     "meridian-storage-core": {
-      "version": "1.0.0",
-      "commit": "ed533571",
-      "wheelSha256": "6b8ebb70ee1a8467a96d668878a8eebf826c1c4b63b3832ae70f2c630a8ef4a1",
-      "sdistSha256": "2c44d44569a380f44ea7f797e7fe623d0242fa79b6bc34606d6bad1bc53f2d5a"
+      "version": "1.1.0",
+      "wheelSha256": "fc7372a17993f43ec285e3d52c0e9c458ef8e6f5ce13bb2d1b01b064aa8eff49",
+      "sdistSha256": "46f7b64b706112dad0b62f768bfaf8b05f22d73d87f77702a0b3f7fd61544ca7"
     },
     "meridian-storage-query": {
-      "version": "1.0.0",
-      "commit": "c358b44",
-      "wheelSha256": "b7ae4572ae70fb51ec190080df40fd10e667d69634ee811f0a7e3f72b56e41cc",
-      "sdistSha256": "ac7d1747e0b9574810f79cfda99abbdd6d0dac230107b655de386871eb8ca9dc"
+      "version": "1.0.3",
+      "wheelSha256": "615035e5d50fd6b1cb6bbdc042eaca2c07cf7f2cc5fe0db68a2c66dd7e36455b",
+      "sdistSha256": "1a1bfea2e77ccbef9da6b9b67fe9d003c4e7ae0dbad15cbe5de07d2be97cfb58"
     },
     "meridian-storage-semantics": {
-      "version": "1.0.0",
-      "commit": "62cc5c",
-      "wheelSha256": "76fced0bc083f145fad1949b85147a3563f3584f99994471693915a8ba1851ec",
-      "sdistSha256": "02605909db5dc7ff22d4ae5e3ae1b3fe6c25a68e9ecaa4c3ead36082848d0311"
+      "version": "2.0.1",
+      "wheelSha256": "5acd127b849a7898c33ed33308b595490447dddb5af9a7d2ec1df16b546279a4",
+      "sdistSha256": "982c94d2697592456b8d8ba862416a80a141c485d5349b3c0d3dcd0dd9ea3fcd"
     }
   },
   "engineProfile": {
@@ -41,10 +38,32 @@
     ],
     "realConformanceVersion": "2.19.1",
     "conformanceImage": "opensearchproject/opensearch:2.19.1@sha256:72fe2fc84be8295906b8efca020b46c58ed45c8da60cd9b8b49e1991e38e89a4",
-    "requiredPlugins": ["analysis-icu"],
-    "singleNodeProfile": {"minimumDataNodes": 1, "replicas": 0},
-    "clusterConformanceProfile": {"minimumEligibleNodes": 3, "minimumDataNodes": 3, "replicas": 1}
+    "requiredPlugins": [
+      "analysis-icu"
+    ],
+    "singleNodeProfile": {
+      "minimumDataNodes": 1,
+      "replicas": 0
+    },
+    "clusterConformanceProfile": {
+      "minimumEligibleNodes": 3,
+      "minimumDataNodes": 3,
+      "replicas": 1
+    },
+    "legacySupportedPatchVersionsMeaning": "historical tested-release metadata; not a membership gate",
+    "additionalConformanceImages": [
+      "opensearchproject/opensearch:2.19.3@sha256:e96cc6ae1500a073d973c0906f30f7cf4d9c461f32f855f9242a2da933660cdd"
+    ]
   },
-  "catalogRegistry": ["structured", "object", "cache", "evidence", "streaming"],
-  "operationContracts": ["meridian.structured.search@1.0.0"]
+  "catalogRegistry": [
+    "structured",
+    "object",
+    "cache",
+    "evidence",
+    "streaming"
+  ],
+  "operationContracts": [
+    "meridian.structured.search@1.0.0"
+  ],
+  "releaseSelectionPolicy": "deployment-owned; historical tested releases are metadata, not an allowlist; untested combinations remain unverified"
 }

@@ -500,6 +500,8 @@ def test_factory_and_runtime_capability_pins(search_layout: object) -> None:
         factory.create(replace(base, binding=replace(base.binding, adapter_id="other")))
     with pytest.raises(ConfigurationError):
         factory.create(replace(base, binding=replace(base.binding, engine_profile="other")))
+    with pytest.raises(ConfigurationError, match="unsupported OpenSearch Adapter SPI"):
+        factory.create(replace(base, binding=replace(base.binding, adapter_contract="2.0.0")))
     with pytest.raises(ConfigurationError):
         factory.create(replace(base, binding=replace(base.binding, physical_namespace="different")))
 

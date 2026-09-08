@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Meridian Core 1.0.0 Adapter factory, runtime, and search session."""
+"""Meridian Core Adapter SPI factory, runtime, and search session."""
 
 from __future__ import annotations
 
@@ -37,6 +37,7 @@ from .client import (
 )
 from .configuration import OpenSearchSettings
 from .descriptor import (
+    ADAPTER_CONTRACT_VERSION,
     ADAPTER_ID,
     ENGINE_PROFILE,
     SEARCH_OPERATION_CONTRACT,
@@ -68,6 +69,10 @@ class OpenSearchAdapterFactory:
         if context.binding.adapter_id != ADAPTER_ID:
             raise ConfigurationError(
                 ErrorCode.CONFIG_INVALID, "Binding Adapter identity does not select OpenSearch"
+            )
+        if context.binding.adapter_contract != ADAPTER_CONTRACT_VERSION:
+            raise ConfigurationError(
+                ErrorCode.CONFIG_INVALID, "Binding requires an unsupported OpenSearch Adapter SPI"
             )
         if context.binding.engine_profile != ENGINE_PROFILE:
             raise ConfigurationError(
@@ -104,7 +109,9 @@ class OpenSearchAdapterRuntime:
         self._client = handle.client
         self.settings = settings
         self.cursor_signer = cursor_signer
-        self._probe = OpenSearchProbe(self._client, settings)
+        self._probe = OpenSearchProbe(
+            self._client, settings, selected_engine_version=context.binding.engine_version
+        )
         self._opened = False
         self._closed = False
         self._manifest: AdapterProbe | None = None
@@ -119,7 +126,7 @@ class OpenSearchAdapterRuntime:
         if manifest.engine_version != binding.engine_version:
             raise CompatibilityError(
                 ErrorCode.CAPABILITY_UNSUPPORTED,
-                "probed OpenSearch version differs from the Binding pin",
+                "observed OpenSearch release differs from the deployment-selected Binding lock",
             )
         if manifest.fingerprint != binding.required_capability_fingerprint:
             raise CompatibilityError(

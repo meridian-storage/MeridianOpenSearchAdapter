@@ -11,9 +11,9 @@ from email.parser import BytesParser
 from pathlib import Path, PurePosixPath
 
 EXPECTED_RUNTIME = {
-    "meridian-storage-core==1.0.0",
-    "meridian-storage-query==1.0.0",
-    "meridian-storage-semantics==1.0.0",
+    "meridian-storage-core<2,>=1.1",
+    "meridian-storage-query<2,>=1.0.3",
+    "meridian-storage-semantics<3,>=2.0.1",
     "opensearch-py<4,>=3.2",
 }
 REQUIRED_WHEEL = {
@@ -35,10 +35,10 @@ def _sha256(path: Path) -> str:
 
 
 def verify(directory: Path) -> dict[str, str]:
-    wheels = sorted(directory.glob("meridian_storage_opensearch-1.0.0-*.whl"))
-    sdists = sorted(directory.glob("meridian_storage_opensearch-1.0.0.tar.gz"))
+    wheels = sorted(directory.glob("meridian_storage_opensearch-1.1.0-*.whl"))
+    sdists = sorted(directory.glob("meridian_storage_opensearch-1.1.0.tar.gz"))
     if len(wheels) != 1 or len(sdists) != 1:
-        raise ValueError("dist must contain exactly one 1.0.0 wheel and one 1.0.0 sdist")
+        raise ValueError("dist must contain exactly one 1.1.0 wheel and one 1.1.0 sdist")
     wheel, sdist = wheels[0], sdists[0]
     with zipfile.ZipFile(wheel) as archive:
         names = archive.namelist()
@@ -54,7 +54,7 @@ def verify(directory: Path) -> dict[str, str]:
             raise ValueError(f"wheel contains an unexpected source package: {source_roots!r}")
         metadata_name = next(name for name in names if name.endswith(".dist-info/METADATA"))
         metadata = BytesParser().parsebytes(archive.read(metadata_name))
-        if metadata["Name"] != "meridian-storage-opensearch" or metadata["Version"] != "1.0.0":
+        if metadata["Name"] != "meridian-storage-opensearch" or metadata["Version"] != "1.1.0":
             raise ValueError("wheel name/version metadata differs from the release")
         if metadata["License-Expression"] != "Apache-2.0":
             raise ValueError("wheel License-Expression must be Apache-2.0")

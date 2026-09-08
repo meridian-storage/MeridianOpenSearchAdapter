@@ -5,13 +5,13 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import sys
 from pathlib import Path
 
 from verify_artifacts import verify
 
 ROOT = Path(__file__).resolve().parents[1]
-IMAGE_DIGEST = "sha256:72fe2fc84be8295906b8efca020b46c58ed45c8da60cd9b8b49e1991e38e89a4"
 
 
 def _digest(path: Path) -> str:
@@ -29,23 +29,20 @@ def main() -> int:
     }
     evidence = {
         "formatVersion": "meridian.opensearch.release-evidence.v1",
-        "adapterVersion": "1.0.0",
+        "adapterVersion": "1.1.0",
         "artifacts": artifacts,
         "compatibilitySha256": _digest(ROOT / "compatibility.json"),
         "contracts": contracts,
         "conformance": {
-            "cluster": {
-                "dataNodes": 3,
-                "eligibleNodes": 3,
-                "nodeLoss": "probe-failed-closed-and-replica-search-succeeded",
-                "replicas": 1,
-            },
-            "engine": "OpenSearch 2.19.1",
-            "imageDigest": IMAGE_DIGEST,
-            "plugin": "analysis-icu 2.19.1",
-            "realEngineVectors": 3,
-            "unitContractPackagingTests": 118,
+            "evidenceDocument": "docs/release-validation.md",
+            "requiredProfiles": ["single-node", "three-node", "node-loss"],
+            "selectedEngineRecipes": json.loads(
+                (ROOT / "compatibility.json").read_text(encoding="utf-8")
+            )["engineProfile"],
+            "note": "Recipes are provenance; consult CI and release-validation for results.",
         },
+        "sourceCommit": os.environ.get("GITHUB_SHA", "unavailable"),
+        "releaseRunId": os.environ.get("GITHUB_RUN_ID", "unavailable"),
         "license": "Apache-2.0",
     }
     output.parent.mkdir(parents=True, exist_ok=True)

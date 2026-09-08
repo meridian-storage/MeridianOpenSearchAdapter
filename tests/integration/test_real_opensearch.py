@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import os
+from dataclasses import replace
 from datetime import UTC, datetime
 from urllib.parse import urlsplit
 
@@ -211,6 +212,14 @@ def test_real_opensearch_v1_conformance(search_layout: ResourceLayout) -> None:
         )
         assert stale.outcome is MutationOutcome.STALE
 
+        valid = _mutation(search_layout, "partial-good", 1, title="Bulk item", body="accepted")
+        invalid = _mutation(search_layout, "partial-bad", 1, title="Bulk item", body="rejected")
+        invalid = replace(invalid, payload={**invalid.payload, "priority": "not-an-integer"})
+        partial = executor.bulk((valid, invalid), refresh_policy="wait_for")
+        assert partial.applied == 1 and len(partial.permanent) == 1
+        assert not partial.retryable
+        assert partial.acknowledgements[1].event_id == invalid.event_id
+
         search = _compiler(search_layout)
         english = _search(
             client,
@@ -364,7 +373,10 @@ def test_real_opensearch_v1_conformance(search_layout: ResourceLayout) -> None:
             }
         )
         probe = OpenSearchProbe(client, settings)
-        assert probe.snapshot().engine_version == "2.19.1"
+        observed = probe.snapshot().engine_version
+        selected = os.environ["OPENSEARCH_VERSION"]
+        assert observed == selected
+        assert probe.probe().evidence["observedEngineVersion"] == observed
         assert probe.verify_layout(search_layout) == search_layout.mapping_fingerprint
     finally:
         for index in (generation_one, generation_two):
