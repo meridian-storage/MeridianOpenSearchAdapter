@@ -48,7 +48,11 @@ def test_compatibility_ledger_pins_exact_released_artifacts() -> None:
         "meridian-storage-query",
         "meridian-storage-semantics",
     }
-    assert all(item["version"] == "1.0.0" for item in dependencies.values())
+    assert {name: item["version"] for name, item in dependencies.items()} == {
+        "meridian-storage-core": "1.1.0",
+        "meridian-storage-query": "1.0.3",
+        "meridian-storage-semantics": "2.0.1",
+    }
     assert all(len(item["wheelSha256"]) == 64 for item in dependencies.values())
     engine = value["engineProfile"]
     assert engine["supportedPatchVersions"] == list(SUPPORTED_ENGINE_VERSIONS)
@@ -82,14 +86,14 @@ def test_machine_readable_conformance_vectors_match_the_public_contract() -> Non
 
 def test_distribution_metadata_and_single_entry_point() -> None:
     distribution = metadata.distribution("meridian-storage-opensearch")
-    assert distribution.version == "1.0.0"
+    assert distribution.version == "1.1.0"
     assert distribution.metadata["License-Expression"] == "Apache-2.0"
     assert distribution.requires is not None
     runtime = [item for item in distribution.requires if "extra ==" not in item]
     assert runtime == [
-        "meridian-storage-core==1.0.0",
-        "meridian-storage-query==1.0.0",
-        "meridian-storage-semantics==1.0.0",
+        "meridian-storage-core<2,>=1.1",
+        "meridian-storage-query<2,>=1.0.3",
+        "meridian-storage-semantics<3,>=2.0.1",
         "opensearch-py<4,>=3.2",
     ]
     points = [
@@ -129,3 +133,24 @@ def test_document_schema_without_search_profile_is_rejected() -> None:
         assert "profile" in str(error)
     else:
         raise AssertionError("mapping compiler accepted a non-search Schema")
+
+
+def test_release_selection_golden_preserves_canonical_binding_and_manifest():
+    from meridian_storage.runtime.config import BindingConfig
+
+    from meridian_storage.adapters.opensearch.configuration import OpenSearchSettings
+    from meridian_storage.adapters.opensearch.descriptor import capability_manifest
+
+    fixture = json.loads((ROOT / "contracts/release-selection.v1.json").read_text())
+    assert fixture["descriptor"] == adapter_descriptor().to_dict()
+    assert fixture["descriptorFingerprint"] == adapter_descriptor().fingerprint
+    for vector in fixture["variants"]:
+        binding = BindingConfig.from_mapping(vector["binding"], "binding")
+        assert binding.to_dict() == vector["binding"]
+        settings = OpenSearchSettings.from_mapping(binding.settings)
+        manifest = capability_manifest(
+            binding.engine_version, pit_enabled=settings.pit_enabled, limits=settings.limits
+        )
+        assert manifest.to_dict() == vector["manifest"]
+        assert manifest.fingerprint == vector["manifestFingerprint"]
+        assert manifest.fingerprint == binding.required_capability_fingerprint

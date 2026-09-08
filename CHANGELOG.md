@@ -2,6 +2,16 @@
 
 # Changelog
 
+## 1.1.0
+
+- Use public contract-compatible Core, Query and Semantics dependencies.
+- Treat historical server versions as provenance; retain deployment lock and fingerprint checks.
+- Verify plugins on each node, analyzer output, read/write alias agreement, bounded search/keyset
+  and deployment-enabled PIT APIs. Report independently selected and observed release provenance.
+- Run unchanged semantic regressions plus partial bulk failure on OpenSearch 2.19.1 and 2.19.3
+  in disposable single-node and replicated cluster profiles.
+
+
 All notable changes follow semantic versioning.
 
 ## 1.0.0 - 2026-08-26

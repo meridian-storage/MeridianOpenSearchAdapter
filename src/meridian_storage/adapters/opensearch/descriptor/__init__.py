@@ -13,7 +13,9 @@ ADAPTER_CONTRACT_VERSION = "1.0.0"
 SEARCH_OPERATION_CONTRACT = "meridian.structured.search"
 SEARCH_OPERATION_VERSION = "1.0.0"
 ENGINE_PROFILE = "opensearch"
-SUPPORTED_ENGINE_VERSIONS = (
+# Historical release metadata, never a preview or startup membership gate.
+# Keep the exported legacy name and serialized v1 field for existing consumers.
+TESTED_ENGINE_VERSIONS = (
     "2.17.0",
     "2.18.0",
     "2.19.0",
@@ -23,6 +25,7 @@ SUPPORTED_ENGINE_VERSIONS = (
     "3.1.0",
     "3.2.0",
 )
+SUPPORTED_ENGINE_VERSIONS = TESTED_ENGINE_VERSIONS
 
 _OPERATORS = (
     "and",
@@ -207,6 +210,7 @@ __all__ = [
     "SEARCH_OPERATION_CONTRACT",
     "SEARCH_OPERATION_VERSION",
     "SUPPORTED_ENGINE_VERSIONS",
+    "TESTED_ENGINE_VERSIONS",
     "adapter_descriptor",
     "capability_manifest",
     "query_capabilities",

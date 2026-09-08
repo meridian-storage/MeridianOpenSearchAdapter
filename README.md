@@ -22,17 +22,20 @@ The sole operation surface is `meridian.structured.search@1.0.0`. The adapter pr
 - explicit generation create/verify/activate/rollback/retire hooks with atomic alias cutover; and
 - authenticated engine, ICU plugin, topology, health, alias, analyzer, replica, and mapping probes.
 
-The exact capability manifest, supported engine patch releases, and hard limits are available from
+The exact capability manifest, historical tested engine releases, and hard limits are available from
 `adapter_descriptor()`, `capability_manifest()`, and `query_capabilities()`.
 
 ## Install
 
 ```console
-python -m pip install meridian-storage-opensearch==1.0.0
+python -m pip install meridian-storage-opensearch==1.1.0
 ```
 
-The distribution requires the released Meridian Core, Query, and Semantics packages at exactly
-`1.0.0`. Artifact hashes and locked design revisions are recorded in
+The distribution consumes Core `>=1.1,<2`, Query `>=1.0.3,<2`, and Semantics `>=2.0.1,<3`.
+These bounds retain the required public API majors and the released dependency repair.
+The deployment selects exact versions; the CI recipe locks Core 1.1.0, Query 1.0.3 and
+Semantics 2.0.1 with hashes. Historical tested engine versions never gate startup.
+Untested combinations remain unverified. Artifact hashes and design revisions are recorded in
 [`compatibility.json`](compatibility.json).
 
 ## Configure through a Meridian Binding
@@ -98,7 +101,7 @@ python -m build
 python scripts/verify_artifacts.py dist
 ```
 
-The Docker harness pins OpenSearch 2.19.1 by digest and installs its matching `analysis-icu`
+The Docker harness locks OpenSearch 2.19.1 and 2.19.3 by digest and installs matching `analysis-icu`
 plugin. Cluster conformance uses three eligible/data nodes, one replica, green-health verification,
 and a deliberate node loss. See [conformance evidence](docs/conformance.md).
 
@@ -106,3 +109,5 @@ and a deliberate node loss. See [conformance evidence](docs/conformance.md).
 
 Licensed under the Apache License 2.0. See [LICENSE](LICENSE), [NOTICE](NOTICE), and
 [SECURITY.md](SECURITY.md).
+
+See [release validation](docs/release-validation.md) for the gate inventory and verified combinations.

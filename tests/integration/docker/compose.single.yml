@@ -4,8 +4,8 @@ services:
     build:
       context: .
       args:
-        OPENSEARCH_VERSION: "2.19.1"
-    image: meridian-opensearch-conformance:2.19.1-icu
+        OPENSEARCH_IMAGE: "${OPENSEARCH_IMAGE:-opensearchproject/opensearch:2.19.1@sha256:72fe2fc84be8295906b8efca020b46c58ed45c8da60cd9b8b49e1991e38e89a4}"
+    image: meridian-opensearch-conformance:${OPENSEARCH_VERSION:-2.19.1}-icu
     environment:
       DISABLE_INSTALL_DEMO_CONFIG: "true"
       DISABLE_SECURITY_PLUGIN: "true"

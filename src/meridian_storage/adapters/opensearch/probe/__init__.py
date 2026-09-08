@@ -7,16 +7,17 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any, cast
 
-from meridian_storage.errors import ErrorCode, ValidationError
+from meridian_storage.errors import CompatibilityError, ErrorCode, ValidationError
 from meridian_storage.semantics import JsonValue, sha256_fingerprint
 from meridian_storage.spi import AdapterProbe, PhysicalResource, PhysicalVerification
 
 from .._canonical import read_alias, write_alias
+from .._version import __version__
 from ..client import ClientProtocol
 from ..configuration import OpenSearchSettings
-from ..descriptor import ENGINE_PROFILE, SUPPORTED_ENGINE_VERSIONS, capability_manifest
+from ..descriptor import capability_manifest
 from ..errors import incompatible, translate_engine_error
-from ..mapping import ResourceLayout
+from ..mapping import HIDDEN_DOCUMENT_ID, ResourceLayout
 
 
 @dataclass(frozen=True, slots=True)
@@ -29,9 +30,16 @@ class ProbeSnapshot:
 
 
 class OpenSearchProbe:
-    def __init__(self, client: ClientProtocol, settings: OpenSearchSettings) -> None:
+    def __init__(
+        self,
+        client: ClientProtocol,
+        settings: OpenSearchSettings,
+        *,
+        selected_engine_version: str | None = None,
+    ) -> None:
         self._client = client
         self.settings = settings
+        self._selected_engine_version = selected_engine_version
 
     def probe(self) -> AdapterProbe:
         snapshot = self.snapshot()
@@ -43,6 +51,10 @@ class OpenSearchProbe:
         return AdapterProbe(
             manifest,
             evidence={
+                "selectedEngineVersion": self._selected_engine_version or "unavailable",
+                "observedEngineVersion": snapshot.engine_version,
+                "observedAdapterVersion": __version__,
+                "releaseObservation": "authenticated-engine-info",
                 "analysis": "multilingual-icu/v1",
                 "clusterStatus": snapshot.cluster_status,
                 "dataNodes": str(snapshot.data_nodes),
@@ -60,10 +72,6 @@ class OpenSearchProbe:
         except Exception as exc:
             translate_engine_error(exc)
         version = _engine_version(info)
-        if version not in SUPPORTED_ENGINE_VERSIONS:
-            incompatible(
-                f"OpenSearch {version} is outside the adapter's released {ENGINE_PROFILE} profile"
-            )
         node_values = _object(nodes, "node probe").get("nodes")
         node_map = _object(node_values, "node probe entries")
         data_nodes = 0
@@ -82,11 +90,18 @@ class OpenSearchProbe:
             raw_plugins = node.get("plugins", ())
             if not isinstance(raw_plugins, Sequence) or isinstance(raw_plugins, (str, bytes)):
                 raise ValidationError(ErrorCode.ADAPTER_FAILURE, "node plugins are invalid")
+            node_plugins: set[str] = set()
             for raw_plugin in raw_plugins:
                 plugin = _object(raw_plugin, "node plugin")
                 name = plugin.get("name") or plugin.get("component")
                 if isinstance(name, str):
-                    plugins.add(name)
+                    node_plugins.add(name)
+            missing_on_node = set(self.settings.required_plugins) - node_plugins
+            if missing_on_node:
+                incompatible(
+                    f"OpenSearch required plugins are absent on a node: {sorted(missing_on_node)!r}"
+                )
+            plugins.update(node_plugins)
         missing = set(self.settings.required_plugins) - plugins
         if missing:
             incompatible(f"OpenSearch required plugins are absent: {sorted(missing)!r}")
@@ -119,8 +134,16 @@ class OpenSearchProbe:
                     resource_ref=layout.resource_ref,
                 )
             mappings = self._client.indices.get_mapping(index=read)
+            read_targets = set(_object(self._client.indices.get_alias(name=read), "read alias"))
+            write_targets = set(_object(self._client.indices.get_alias(name=write), "write alias"))
+            if len(read_targets) != 1 or read_targets != write_targets:
+                raise ValidationError(
+                    ErrorCode.PHYSICAL_FINGERPRINT,
+                    "read/write aliases must resolve to the same single generation",
+                    resource_ref=layout.resource_ref,
+                )
             settings = self._client.indices.get_settings(index=read)
-            self._client.indices.analyze(
+            analysis = self._client.indices.analyze(
                 index=read,
                 body={"analyzer": "meridian_icu", "text": "Meridian 中文 validation"},
             )
@@ -128,6 +151,16 @@ class OpenSearchProbe:
             raise
         except Exception as exc:
             translate_engine_error(exc, resource_ref=layout.resource_ref)
+        tokens = _object(analysis, "analyzer response").get("tokens")
+        if (
+            not isinstance(tokens, list)
+            or not tokens
+            or any(
+                not isinstance(token, Mapping) or not isinstance(token.get("token"), str)
+                for token in tokens
+            )
+        ):
+            incompatible("OpenSearch required ICU analyzer returned no valid tokens")
         mapping_fingerprints = _mapping_fingerprints(mappings)
         if mapping_fingerprints != {layout.mapping_fingerprint}:
             raise ValidationError(
@@ -142,7 +175,53 @@ class OpenSearchProbe:
                 "active generation replica count is below the deployment profile",
                 resource_ref=layout.resource_ref,
             )
+        self._verify_search_api(read)
         return layout.mapping_fingerprint
+
+    def _verify_search_api(self, read: str) -> None:
+        """Exercise bounded search/keyset and optional PIT APIs without reading Records."""
+
+        pit_id: str | None = None
+        try:
+            body: dict[str, object] = {
+                "query": {"match_none": {}},
+                "size": 1,
+                "timeout": "5s",
+                "sort": [{HIDDEN_DOCUMENT_ID: "asc"}],
+                "search_after": ["meridian-probe"],
+                "_source": False,
+            }
+            if self.settings.pit_enabled:
+                opened = self._client.transport.perform_request(
+                    "POST", f"/{read}/_search/point_in_time", params={"keep_alive": "1m"}
+                )
+                value = _object(opened, "PIT response").get("pit_id")
+                if not isinstance(value, str) or not value:
+                    incompatible("OpenSearch required point-in-time API returned no id")
+                pit_id = value
+                body["pit"] = {"id": pit_id, "keep_alive": "1m"}
+                response = self._client.search(body=body)
+            else:
+                response = self._client.search(index=read, body=body)
+            result = _object(response, "search API response")
+            shards = _object(result.get("_shards"), "search API shards")
+            if result.get("timed_out") is not False or shards.get("failed") != 0:
+                incompatible("OpenSearch required search API timed out or returned shard failures")
+            hits = _object(result.get("hits"), "search API hits").get("hits")
+            if not isinstance(hits, list):
+                incompatible("OpenSearch required search API returned invalid hits")
+        except (ValidationError, CompatibilityError):
+            raise
+        except Exception as exc:
+            translate_engine_error(exc)
+        finally:
+            if pit_id is not None:
+                try:
+                    self._client.transport.perform_request(
+                        "DELETE", "/_search/point_in_time", body={"pit_id": pit_id}
+                    )
+                except Exception as exc:
+                    translate_engine_error(exc)
 
     def verify_physical(self, resources: tuple[PhysicalResource, ...]) -> PhysicalVerification:
         mappings: dict[str, str] = {}
@@ -181,7 +260,7 @@ class OpenSearchProbe:
 def _engine_version(value: object) -> str:
     info = _object(value, "engine info")
     version = _object(info.get("version"), "engine version").get("number")
-    if not isinstance(version, str):
+    if not isinstance(version, str) or not version.strip():
         raise ValidationError(ErrorCode.ADAPTER_FAILURE, "OpenSearch version is absent")
     return version
 

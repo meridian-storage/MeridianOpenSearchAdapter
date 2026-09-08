@@ -26,9 +26,9 @@ classifiers = [
   "Typing :: Typed",
 ]
 dependencies = [
-  "meridian-storage-core==1.0.0",
-  "meridian-storage-query==1.0.0",
-  "meridian-storage-semantics==1.0.0",
+  "meridian-storage-core>=1.1,<2",
+  "meridian-storage-query>=1.0.3,<2",
+  "meridian-storage-semantics>=2.0.1,<3",
   "opensearch-py>=3.2,<4",
 ]
 

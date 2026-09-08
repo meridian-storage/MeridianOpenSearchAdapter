@@ -11,7 +11,7 @@ The test pyramid is executable and deterministic:
   distribution metadata, and sole entry point;
 - packaging tests enforce Apache material, SPDX headers, one repository/one distribution, and the
   sole adapter namespace;
-- the single-node Docker vector uses digest-pinned OpenSearch 2.19.1 with `analysis-icu` and exercises
+- the single-node Docker vector uses digest-pinned OpenSearch 2.19.1 and 2.19.3 with `analysis-icu` and exercises
   real mapping creation, bulk indexing, stale versions, tombstones, EN/ZH/Arabic ICU relevance,
   scope isolation, facets, highlights, live/PIT pagination, strict mapping failure, migration,
   rollback, retirement, and physical health;
@@ -30,3 +30,6 @@ Both scripts use isolated Compose resources, wait for engine health, and remove 
 ephemeral volumes on exit. CI runs the same commands. Machine-readable vector descriptions live in
 [`evidence/conformance-vectors.json`](../evidence/conformance-vectors.json); release artifact hashes
 are emitted by `scripts/generate_evidence.py` after the reproducible build check.
+
+The gate classification, public dependency closure, exact image digests and independent release
+selection commands are recorded in [release validation](release-validation.md).

@@ -1,0 +1,1020 @@
+{
+  "descriptor": {
+    "adapterContractVersion": "1.0.0",
+    "adapterId": "org.meridian.storage.opensearch",
+    "capabilities": [
+      {
+        "cursorBehavior": "signed-live-search-after",
+        "extensions": {
+          "analysisProfile": "multilingual-icu/v1",
+          "denied": [
+            "authoritative-crud",
+            "authoritative-transactions",
+            "audit-atomicity",
+            "cas",
+            "consumer-dsl",
+            "consumer-regex",
+            "consumer-scripts",
+            "cross-binding-join"
+          ],
+          "initialLanguages": [
+            "en",
+            "zh"
+          ],
+          "languageMetadata": "unrestricted-bcp47-with-icu-fallback",
+          "pointInTime": "deployment-conditional",
+          "projection": {
+            "consistency": "eventual",
+            "externalVersioning": "external_gte",
+            "writes": [
+              "upsert",
+              "tombstone-delete",
+              "bounded-bulk"
+            ]
+          },
+          "rebuild": "generation-and-alias-hooks"
+        },
+        "guarantees": [
+          "eventual-consistency",
+          "logical-record-references",
+          "scope-isolation",
+          "single-binding",
+          "stable-keyset"
+        ],
+        "healthProbes": [
+          "analysis-resources",
+          "authenticated",
+          "cluster-health",
+          "mapping-fingerprint",
+          "plugins",
+          "topology"
+        ],
+        "limits": {
+          "bulkActions": 1000,
+          "bulkBytes": 8388608,
+          "facetBuckets": 100,
+          "facets": 32,
+          "filterClauses": 128,
+          "highlightFragments": 5,
+          "highlights": 32,
+          "pageSize": 500,
+          "queryBytes": 16384
+        },
+        "migrationBehavior": "external-generation-hooks-with-atomic-alias-cutover",
+        "operationContract": "meridian.structured.search",
+        "operationVersions": [
+          "1.0.0"
+        ]
+      }
+    ],
+    "driver": "opensearch-py/3",
+    "supportedEngineVersions": {
+      "opensearch": [
+        "2.17.0",
+        "2.18.0",
+        "2.19.0",
+        "2.19.1",
+        "2.19.2",
+        "3.0.0",
+        "3.1.0",
+        "3.2.0"
+      ]
+    }
+  },
+  "descriptorFingerprint": "sha256:e01a06344a4a1eeecee0741129d89ba04737c2bd9644a6c4f0c0773453d34bca",
+  "formatVersion": "meridian.opensearch.release-selection.v1",
+  "variants": [
+    {
+      "binding": {
+        "adapterContract": "1.0.0",
+        "adapterId": "org.meridian.storage.opensearch",
+        "client": {
+          "acquireTimeoutMs": 1000,
+          "idleTimeoutMs": 1000,
+          "iteratorLifetimeMs": 60000,
+          "maxResultBytes": 1000000,
+          "maxSize": 4,
+          "minSize": 0,
+          "operationTimeoutMs": 5000
+        },
+        "compatibilityPins": {},
+        "endpoint": "http://localhost:9200",
+        "engineProfile": "opensearch",
+        "engineVersion": "2.19.1",
+        "extensions": {},
+        "id": "search-binding",
+        "identityRef": {
+          "provider": "test",
+          "reference": "identity"
+        },
+        "physicalNamespace": "meridian",
+        "requiredCapabilityFingerprint": "sha256:a87bfd72d1a6777fd6bc5fc73c802804dbcef6a03d30aa24dcb85b01c0220c62",
+        "requiredPhysicalFingerprint": null,
+        "secretRef": {
+          "provider": "test",
+          "reference": "credential"
+        },
+        "serviceRef": null,
+        "settings": {
+          "indexPrefix": "meridian",
+          "layouts": {
+            "structured:investigation.articles": {
+              "analysisFingerprint": "sha256:a901b4564858c6a11806ad04cc7149bb183acc634a2a3bae4679f725a7dfdb3d",
+              "facetFields": [
+                "category",
+                "labels"
+              ],
+              "fields": {
+                "active": {
+                  "cardinality": "one",
+                  "jsonPointer": null,
+                  "language": null,
+                  "logicalKind": "boolean",
+                  "logicalName": "active",
+                  "modes": [
+                    "exact",
+                    "exists"
+                  ],
+                  "physicalName": "f_96879611650f80a81392a52e",
+                  "sourceField": null
+                },
+                "body": {
+                  "cardinality": "one",
+                  "jsonPointer": null,
+                  "language": null,
+                  "logicalKind": "string",
+                  "logicalName": "body",
+                  "modes": [
+                    "exact",
+                    "exists",
+                    "full-text",
+                    "highlight",
+                    "prefix"
+                  ],
+                  "physicalName": "f_230d8358dc8e8890b4c58dee",
+                  "sourceField": null
+                },
+                "category": {
+                  "cardinality": "one",
+                  "jsonPointer": null,
+                  "language": null,
+                  "logicalKind": "string",
+                  "logicalName": "category",
+                  "modes": [
+                    "exact",
+                    "exists",
+                    "facet",
+                    "prefix"
+                  ],
+                  "physicalName": "f_edb2cd3b74c999af70f0b705",
+                  "sourceField": null
+                },
+                "id": {
+                  "cardinality": "one",
+                  "jsonPointer": null,
+                  "language": null,
+                  "logicalKind": "uuid",
+                  "logicalName": "id",
+                  "modes": [
+                    "exact",
+                    "exists",
+                    "prefix"
+                  ],
+                  "physicalName": "f_a56145270ce6b3bebd1dd012",
+                  "sourceField": null
+                },
+                "labels": {
+                  "cardinality": "many",
+                  "jsonPointer": null,
+                  "language": null,
+                  "logicalKind": "string",
+                  "logicalName": "labels",
+                  "modes": [
+                    "exact",
+                    "exists",
+                    "facet",
+                    "prefix"
+                  ],
+                  "physicalName": "f_d772ebb4590212c65cc31888",
+                  "sourceField": null
+                },
+                "priority": {
+                  "cardinality": "one",
+                  "jsonPointer": null,
+                  "language": null,
+                  "logicalKind": "int32",
+                  "logicalName": "priority",
+                  "modes": [
+                    "exact",
+                    "exists",
+                    "range"
+                  ],
+                  "physicalName": "f_3092a5f0dba05ff3cadc3c2c",
+                  "sourceField": null
+                },
+                "published": {
+                  "cardinality": "one",
+                  "jsonPointer": null,
+                  "language": null,
+                  "logicalKind": "utcTimestamp",
+                  "logicalName": "published",
+                  "modes": [
+                    "exact",
+                    "exists",
+                    "range"
+                  ],
+                  "physicalName": "f_b04e5ea201bb040cae53f693",
+                  "sourceField": null
+                },
+                "title": {
+                  "cardinality": "one",
+                  "jsonPointer": null,
+                  "language": "en",
+                  "logicalKind": "string",
+                  "logicalName": "title",
+                  "modes": [
+                    "exact",
+                    "exists",
+                    "full-text",
+                    "highlight",
+                    "prefix"
+                  ],
+                  "physicalName": "f_aaf2320646108059a87ab501",
+                  "sourceField": null
+                }
+              },
+              "formatVersion": "meridian.opensearch.layout.v1",
+              "highlightFields": [
+                "title",
+                "body"
+              ],
+              "identity": [
+                "id"
+              ],
+              "indexBody": {
+                "mappings": {
+                  "_meta": {
+                    "analysisFingerprint": "sha256:a901b4564858c6a11806ad04cc7149bb183acc634a2a3bae4679f725a7dfdb3d",
+                    "formatVersion": "meridian.opensearch.mapping.v1",
+                    "mappingFingerprint": "sha256:32ffc523941cb30f01d5e8a1d963ac8fb218320342bb5966cae56df0ffc27450",
+                    "profileFingerprint": "sha256:9eee8b66f3b4068e8ed2c0921576f5b841f3e7934df3c23c3de7e04b5414c51a",
+                    "resourceRef": "structured:investigation.articles",
+                    "schemaFingerprint": "sha256:544c32542a1b72bcc4e6b86f2205043443a40181404de0cc547e46a2a47f20d6"
+                  },
+                  "dynamic": "strict",
+                  "properties": {
+                    "f_230d8358dc8e8890b4c58dee": {
+                      "analyzer": "meridian_icu",
+                      "fields": {
+                        "exact": {
+                          "ignore_above": 32766,
+                          "type": "keyword"
+                        }
+                      },
+                      "search_analyzer": "meridian_icu",
+                      "type": "text"
+                    },
+                    "f_3092a5f0dba05ff3cadc3c2c": {
+                      "type": "long"
+                    },
+                    "f_96879611650f80a81392a52e": {
+                      "type": "boolean"
+                    },
+                    "f_a56145270ce6b3bebd1dd012": {
+                      "ignore_above": 32766,
+                      "type": "keyword"
+                    },
+                    "f_aaf2320646108059a87ab501": {
+                      "analyzer": "meridian_en",
+                      "fields": {
+                        "exact": {
+                          "ignore_above": 32766,
+                          "type": "keyword"
+                        }
+                      },
+                      "search_analyzer": "meridian_en",
+                      "type": "text"
+                    },
+                    "f_b04e5ea201bb040cae53f693": {
+                      "format": "strict_date_optional_time_nanos",
+                      "type": "date"
+                    },
+                    "f_d772ebb4590212c65cc31888": {
+                      "ignore_above": 32766,
+                      "type": "keyword"
+                    },
+                    "f_edb2cd3b74c999af70f0b705": {
+                      "ignore_above": 32766,
+                      "type": "keyword"
+                    },
+                    "m_deleted": {
+                      "type": "boolean"
+                    },
+                    "m_document_id": {
+                      "ignore_above": 32766,
+                      "type": "keyword"
+                    },
+                    "m_event_id": {
+                      "ignore_above": 32766,
+                      "type": "keyword"
+                    },
+                    "m_projected_at": {
+                      "format": "strict_date_optional_time_nanos",
+                      "type": "date"
+                    },
+                    "m_record_id": {
+                      "doc_values": false,
+                      "index": false,
+                      "type": "keyword"
+                    },
+                    "m_resource": {
+                      "ignore_above": 32766,
+                      "type": "keyword"
+                    },
+                    "m_schema_fingerprint": {
+                      "ignore_above": 32766,
+                      "type": "keyword"
+                    },
+                    "m_schema_version": {
+                      "ignore_above": 32766,
+                      "type": "keyword"
+                    },
+                    "m_scope": {
+                      "ignore_above": 32766,
+                      "type": "keyword"
+                    },
+                    "m_source_digest": {
+                      "ignore_above": 32766,
+                      "type": "keyword"
+                    },
+                    "m_source_sequence": {
+                      "type": "long"
+                    },
+                    "m_source_version": {
+                      "ignore_above": 32766,
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "settings": {
+                  "analysis": {
+                    "analyzer": {
+                      "meridian_en": {
+                        "char_filter": [],
+                        "filter": [
+                          "meridian_en_possessive",
+                          "lowercase",
+                          "meridian_en_stop",
+                          "meridian_en_stemmer",
+                          "meridian_icu_folding"
+                        ],
+                        "tokenizer": "icu_tokenizer",
+                        "type": "custom"
+                      },
+                      "meridian_icu": {
+                        "char_filter": [],
+                        "filter": [
+                          "lowercase",
+                          "meridian_icu_folding"
+                        ],
+                        "tokenizer": "icu_tokenizer",
+                        "type": "custom"
+                      },
+                      "meridian_zh": {
+                        "char_filter": [],
+                        "filter": [
+                          "lowercase",
+                          "meridian_icu_folding"
+                        ],
+                        "tokenizer": "icu_tokenizer",
+                        "type": "custom"
+                      }
+                    },
+                    "filter": {
+                      "meridian_en_possessive": {
+                        "language": "possessive_english",
+                        "type": "stemmer"
+                      },
+                      "meridian_en_stemmer": {
+                        "language": "english",
+                        "type": "stemmer"
+                      },
+                      "meridian_en_stop": {
+                        "stopwords": "_english_",
+                        "type": "stop"
+                      },
+                      "meridian_icu_folding": {
+                        "type": "icu_folding"
+                      }
+                    },
+                    "normalizer": {
+                      "meridian_keyword": {
+                        "char_filter": [],
+                        "filter": [
+                          "icu_normalizer",
+                          "lowercase"
+                        ],
+                        "type": "custom"
+                      }
+                    }
+                  },
+                  "mapping": {
+                    "total_fields": {
+                      "limit": 52
+                    }
+                  },
+                  "number_of_replicas": 0,
+                  "number_of_shards": 1,
+                  "refresh_interval": "1s"
+                }
+              },
+              "mappingFingerprint": "sha256:32ffc523941cb30f01d5e8a1d963ac8fb218320342bb5966cae56df0ffc27450",
+              "profileFingerprint": "sha256:9eee8b66f3b4068e8ed2c0921576f5b841f3e7934df3c23c3de7e04b5414c51a",
+              "profileKind": "search",
+              "ranking": "bm25",
+              "resourceRef": "structured:investigation.articles",
+              "schemaFingerprint": "sha256:544c32542a1b72bcc4e6b86f2205043443a40181404de0cc547e46a2a47f20d6",
+              "schemaRef": "structured:investigation.article@1.0.0",
+              "sourceFields": [
+                "title",
+                "body"
+              ]
+            }
+          },
+          "pitEnabled": false,
+          "requiredPlugins": [
+            "analysis-icu"
+          ]
+        },
+        "tls": {
+          "caRef": null,
+          "clientCertificateRef": null,
+          "mode": "disabled",
+          "serverName": null
+        }
+      },
+      "manifest": {
+        "availableOperationContracts": [
+          "meridian.structured.search"
+        ],
+        "descriptor": {
+          "adapterContractVersion": "1.0.0",
+          "adapterId": "org.meridian.storage.opensearch",
+          "capabilities": [
+            {
+              "cursorBehavior": "signed-live-search-after",
+              "extensions": {
+                "analysisProfile": "multilingual-icu/v1",
+                "denied": [
+                  "authoritative-crud",
+                  "authoritative-transactions",
+                  "audit-atomicity",
+                  "cas",
+                  "consumer-dsl",
+                  "consumer-regex",
+                  "consumer-scripts",
+                  "cross-binding-join"
+                ],
+                "initialLanguages": [
+                  "en",
+                  "zh"
+                ],
+                "languageMetadata": "unrestricted-bcp47-with-icu-fallback",
+                "pointInTime": "deployment-conditional",
+                "projection": {
+                  "consistency": "eventual",
+                  "externalVersioning": "external_gte",
+                  "writes": [
+                    "upsert",
+                    "tombstone-delete",
+                    "bounded-bulk"
+                  ]
+                },
+                "rebuild": "generation-and-alias-hooks"
+              },
+              "guarantees": [
+                "eventual-consistency",
+                "logical-record-references",
+                "scope-isolation",
+                "single-binding",
+                "stable-keyset"
+              ],
+              "healthProbes": [
+                "analysis-resources",
+                "authenticated",
+                "cluster-health",
+                "mapping-fingerprint",
+                "plugins",
+                "topology"
+              ],
+              "limits": {
+                "bulkActions": 1000,
+                "bulkBytes": 8388608,
+                "facetBuckets": 100,
+                "facets": 32,
+                "filterClauses": 128,
+                "highlightFragments": 5,
+                "highlights": 32,
+                "pageSize": 500,
+                "queryBytes": 16384
+              },
+              "migrationBehavior": "external-generation-hooks-with-atomic-alias-cutover",
+              "operationContract": "meridian.structured.search",
+              "operationVersions": [
+                "1.0.0"
+              ]
+            }
+          ],
+          "driver": "opensearch-py/3",
+          "supportedEngineVersions": {
+            "opensearch": [
+              "2.17.0",
+              "2.18.0",
+              "2.19.0",
+              "2.19.1",
+              "2.19.2",
+              "3.0.0",
+              "3.1.0",
+              "3.2.0"
+            ]
+          }
+        },
+        "engineProfile": "opensearch",
+        "engineVersion": "2.19.1",
+        "extensions": {
+          "analysisProfile": "multilingual-icu/v1",
+          "consistency": "eventual",
+          "pointInTime": "disabled"
+        },
+        "formatVersion": "meridian-adapter-capabilities.v1"
+      },
+      "manifestFingerprint": "sha256:a87bfd72d1a6777fd6bc5fc73c802804dbcef6a03d30aa24dcb85b01c0220c62"
+    },
+    {
+      "binding": {
+        "adapterContract": "1.0.0",
+        "adapterId": "org.meridian.storage.opensearch",
+        "client": {
+          "acquireTimeoutMs": 1000,
+          "idleTimeoutMs": 1000,
+          "iteratorLifetimeMs": 60000,
+          "maxResultBytes": 1000000,
+          "maxSize": 4,
+          "minSize": 0,
+          "operationTimeoutMs": 5000
+        },
+        "compatibilityPins": {},
+        "endpoint": "http://localhost:9200",
+        "engineProfile": "opensearch",
+        "engineVersion": "2.19.3",
+        "extensions": {},
+        "id": "search-binding",
+        "identityRef": {
+          "provider": "test",
+          "reference": "identity"
+        },
+        "physicalNamespace": "meridian",
+        "requiredCapabilityFingerprint": "sha256:625242527cfec4291a2c89121604cffab23a3c6338b8c85415277b41d09cc174",
+        "requiredPhysicalFingerprint": null,
+        "secretRef": {
+          "provider": "test",
+          "reference": "credential"
+        },
+        "serviceRef": null,
+        "settings": {
+          "indexPrefix": "meridian",
+          "layouts": {
+            "structured:investigation.articles": {
+              "analysisFingerprint": "sha256:a901b4564858c6a11806ad04cc7149bb183acc634a2a3bae4679f725a7dfdb3d",
+              "facetFields": [
+                "category",
+                "labels"
+              ],
+              "fields": {
+                "active": {
+                  "cardinality": "one",
+                  "jsonPointer": null,
+                  "language": null,
+                  "logicalKind": "boolean",
+                  "logicalName": "active",
+                  "modes": [
+                    "exact",
+                    "exists"
+                  ],
+                  "physicalName": "f_96879611650f80a81392a52e",
+                  "sourceField": null
+                },
+                "body": {
+                  "cardinality": "one",
+                  "jsonPointer": null,
+                  "language": null,
+                  "logicalKind": "string",
+                  "logicalName": "body",
+                  "modes": [
+                    "exact",
+                    "exists",
+                    "full-text",
+                    "highlight",
+                    "prefix"
+                  ],
+                  "physicalName": "f_230d8358dc8e8890b4c58dee",
+                  "sourceField": null
+                },
+                "category": {
+                  "cardinality": "one",
+                  "jsonPointer": null,
+                  "language": null,
+                  "logicalKind": "string",
+                  "logicalName": "category",
+                  "modes": [
+                    "exact",
+                    "exists",
+                    "facet",
+                    "prefix"
+                  ],
+                  "physicalName": "f_edb2cd3b74c999af70f0b705",
+                  "sourceField": null
+                },
+                "id": {
+                  "cardinality": "one",
+                  "jsonPointer": null,
+                  "language": null,
+                  "logicalKind": "uuid",
+                  "logicalName": "id",
+                  "modes": [
+                    "exact",
+                    "exists",
+                    "prefix"
+                  ],
+                  "physicalName": "f_a56145270ce6b3bebd1dd012",
+                  "sourceField": null
+                },
+                "labels": {
+                  "cardinality": "many",
+                  "jsonPointer": null,
+                  "language": null,
+                  "logicalKind": "string",
+                  "logicalName": "labels",
+                  "modes": [
+                    "exact",
+                    "exists",
+                    "facet",
+                    "prefix"
+                  ],
+                  "physicalName": "f_d772ebb4590212c65cc31888",
+                  "sourceField": null
+                },
+                "priority": {
+                  "cardinality": "one",
+                  "jsonPointer": null,
+                  "language": null,
+                  "logicalKind": "int32",
+                  "logicalName": "priority",
+                  "modes": [
+                    "exact",
+                    "exists",
+                    "range"
+                  ],
+                  "physicalName": "f_3092a5f0dba05ff3cadc3c2c",
+                  "sourceField": null
+                },
+                "published": {
+                  "cardinality": "one",
+                  "jsonPointer": null,
+                  "language": null,
+                  "logicalKind": "utcTimestamp",
+                  "logicalName": "published",
+                  "modes": [
+                    "exact",
+                    "exists",
+                    "range"
+                  ],
+                  "physicalName": "f_b04e5ea201bb040cae53f693",
+                  "sourceField": null
+                },
+                "title": {
+                  "cardinality": "one",
+                  "jsonPointer": null,
+                  "language": "en",
+                  "logicalKind": "string",
+                  "logicalName": "title",
+                  "modes": [
+                    "exact",
+                    "exists",
+                    "full-text",
+                    "highlight",
+                    "prefix"
+                  ],
+                  "physicalName": "f_aaf2320646108059a87ab501",
+                  "sourceField": null
+                }
+              },
+              "formatVersion": "meridian.opensearch.layout.v1",
+              "highlightFields": [
+                "title",
+                "body"
+              ],
+              "identity": [
+                "id"
+              ],
+              "indexBody": {
+                "mappings": {
+                  "_meta": {
+                    "analysisFingerprint": "sha256:a901b4564858c6a11806ad04cc7149bb183acc634a2a3bae4679f725a7dfdb3d",
+                    "formatVersion": "meridian.opensearch.mapping.v1",
+                    "mappingFingerprint": "sha256:32ffc523941cb30f01d5e8a1d963ac8fb218320342bb5966cae56df0ffc27450",
+                    "profileFingerprint": "sha256:9eee8b66f3b4068e8ed2c0921576f5b841f3e7934df3c23c3de7e04b5414c51a",
+                    "resourceRef": "structured:investigation.articles",
+                    "schemaFingerprint": "sha256:544c32542a1b72bcc4e6b86f2205043443a40181404de0cc547e46a2a47f20d6"
+                  },
+                  "dynamic": "strict",
+                  "properties": {
+                    "f_230d8358dc8e8890b4c58dee": {
+                      "analyzer": "meridian_icu",
+                      "fields": {
+                        "exact": {
+                          "ignore_above": 32766,
+                          "type": "keyword"
+                        }
+                      },
+                      "search_analyzer": "meridian_icu",
+                      "type": "text"
+                    },
+                    "f_3092a5f0dba05ff3cadc3c2c": {
+                      "type": "long"
+                    },
+                    "f_96879611650f80a81392a52e": {
+                      "type": "boolean"
+                    },
+                    "f_a56145270ce6b3bebd1dd012": {
+                      "ignore_above": 32766,
+                      "type": "keyword"
+                    },
+                    "f_aaf2320646108059a87ab501": {
+                      "analyzer": "meridian_en",
+                      "fields": {
+                        "exact": {
+                          "ignore_above": 32766,
+                          "type": "keyword"
+                        }
+                      },
+                      "search_analyzer": "meridian_en",
+                      "type": "text"
+                    },
+                    "f_b04e5ea201bb040cae53f693": {
+                      "format": "strict_date_optional_time_nanos",
+                      "type": "date"
+                    },
+                    "f_d772ebb4590212c65cc31888": {
+                      "ignore_above": 32766,
+                      "type": "keyword"
+                    },
+                    "f_edb2cd3b74c999af70f0b705": {
+                      "ignore_above": 32766,
+                      "type": "keyword"
+                    },
+                    "m_deleted": {
+                      "type": "boolean"
+                    },
+                    "m_document_id": {
+                      "ignore_above": 32766,
+                      "type": "keyword"
+                    },
+                    "m_event_id": {
+                      "ignore_above": 32766,
+                      "type": "keyword"
+                    },
+                    "m_projected_at": {
+                      "format": "strict_date_optional_time_nanos",
+                      "type": "date"
+                    },
+                    "m_record_id": {
+                      "doc_values": false,
+                      "index": false,
+                      "type": "keyword"
+                    },
+                    "m_resource": {
+                      "ignore_above": 32766,
+                      "type": "keyword"
+                    },
+                    "m_schema_fingerprint": {
+                      "ignore_above": 32766,
+                      "type": "keyword"
+                    },
+                    "m_schema_version": {
+                      "ignore_above": 32766,
+                      "type": "keyword"
+                    },
+                    "m_scope": {
+                      "ignore_above": 32766,
+                      "type": "keyword"
+                    },
+                    "m_source_digest": {
+                      "ignore_above": 32766,
+                      "type": "keyword"
+                    },
+                    "m_source_sequence": {
+                      "type": "long"
+                    },
+                    "m_source_version": {
+                      "ignore_above": 32766,
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "settings": {
+                  "analysis": {
+                    "analyzer": {
+                      "meridian_en": {
+                        "char_filter": [],
+                        "filter": [
+                          "meridian_en_possessive",
+                          "lowercase",
+                          "meridian_en_stop",
+                          "meridian_en_stemmer",
+                          "meridian_icu_folding"
+                        ],
+                        "tokenizer": "icu_tokenizer",
+                        "type": "custom"
+                      },
+                      "meridian_icu": {
+                        "char_filter": [],
+                        "filter": [
+                          "lowercase",
+                          "meridian_icu_folding"
+                        ],
+                        "tokenizer": "icu_tokenizer",
+                        "type": "custom"
+                      },
+                      "meridian_zh": {
+                        "char_filter": [],
+                        "filter": [
+                          "lowercase",
+                          "meridian_icu_folding"
+                        ],
+                        "tokenizer": "icu_tokenizer",
+                        "type": "custom"
+                      }
+                    },
+                    "filter": {
+                      "meridian_en_possessive": {
+                        "language": "possessive_english",
+                        "type": "stemmer"
+                      },
+                      "meridian_en_stemmer": {
+                        "language": "english",
+                        "type": "stemmer"
+                      },
+                      "meridian_en_stop": {
+                        "stopwords": "_english_",
+                        "type": "stop"
+                      },
+                      "meridian_icu_folding": {
+                        "type": "icu_folding"
+                      }
+                    },
+                    "normalizer": {
+                      "meridian_keyword": {
+                        "char_filter": [],
+                        "filter": [
+                          "icu_normalizer",
+                          "lowercase"
+                        ],
+                        "type": "custom"
+                      }
+                    }
+                  },
+                  "mapping": {
+                    "total_fields": {
+                      "limit": 52
+                    }
+                  },
+                  "number_of_replicas": 0,
+                  "number_of_shards": 1,
+                  "refresh_interval": "1s"
+                }
+              },
+              "mappingFingerprint": "sha256:32ffc523941cb30f01d5e8a1d963ac8fb218320342bb5966cae56df0ffc27450",
+              "profileFingerprint": "sha256:9eee8b66f3b4068e8ed2c0921576f5b841f3e7934df3c23c3de7e04b5414c51a",
+              "profileKind": "search",
+              "ranking": "bm25",
+              "resourceRef": "structured:investigation.articles",
+              "schemaFingerprint": "sha256:544c32542a1b72bcc4e6b86f2205043443a40181404de0cc547e46a2a47f20d6",
+              "schemaRef": "structured:investigation.article@1.0.0",
+              "sourceFields": [
+                "title",
+                "body"
+              ]
+            }
+          },
+          "pitEnabled": false,
+          "requiredPlugins": [
+            "analysis-icu"
+          ]
+        },
+        "tls": {
+          "caRef": null,
+          "clientCertificateRef": null,
+          "mode": "disabled",
+          "serverName": null
+        }
+      },
+      "manifest": {
+        "availableOperationContracts": [
+          "meridian.structured.search"
+        ],
+        "descriptor": {
+          "adapterContractVersion": "1.0.0",
+          "adapterId": "org.meridian.storage.opensearch",
+          "capabilities": [
+            {
+              "cursorBehavior": "signed-live-search-after",
+              "extensions": {
+                "analysisProfile": "multilingual-icu/v1",
+                "denied": [
+                  "authoritative-crud",
+                  "authoritative-transactions",
+                  "audit-atomicity",
+                  "cas",
+                  "consumer-dsl",
+                  "consumer-regex",
+                  "consumer-scripts",
+                  "cross-binding-join"
+                ],
+                "initialLanguages": [
+                  "en",
+                  "zh"
+                ],
+                "languageMetadata": "unrestricted-bcp47-with-icu-fallback",
+                "pointInTime": "deployment-conditional",
+                "projection": {
+                  "consistency": "eventual",
+                  "externalVersioning": "external_gte",
+                  "writes": [
+                    "upsert",
+                    "tombstone-delete",
+                    "bounded-bulk"
+                  ]
+                },
+                "rebuild": "generation-and-alias-hooks"
+              },
+              "guarantees": [
+                "eventual-consistency",
+                "logical-record-references",
+                "scope-isolation",
+                "single-binding",
+                "stable-keyset"
+              ],
+              "healthProbes": [
+                "analysis-resources",
+                "authenticated",
+                "cluster-health",
+                "mapping-fingerprint",
+                "plugins",
+                "topology"
+              ],
+              "limits": {
+                "bulkActions": 1000,
+                "bulkBytes": 8388608,
+                "facetBuckets": 100,
+                "facets": 32,
+                "filterClauses": 128,
+                "highlightFragments": 5,
+                "highlights": 32,
+                "pageSize": 500,
+                "queryBytes": 16384
+              },
+              "migrationBehavior": "external-generation-hooks-with-atomic-alias-cutover",
+              "operationContract": "meridian.structured.search",
+              "operationVersions": [
+                "1.0.0"
+              ]
+            }
+          ],
+          "driver": "opensearch-py/3",
+          "supportedEngineVersions": {
+            "opensearch": [
+              "2.17.0",
+              "2.18.0",
+              "2.19.0",
+              "2.19.1",
+              "2.19.2",
+              "3.0.0",
+              "3.1.0",
+              "3.2.0"
+            ]
+          }
+        },
+        "engineProfile": "opensearch",
+        "engineVersion": "2.19.3",
+        "extensions": {
+          "analysisProfile": "multilingual-icu/v1",
+          "consistency": "eventual",
+          "pointInTime": "disabled"
+        },
+        "formatVersion": "meridian-adapter-capabilities.v1"
+      },
+      "manifestFingerprint": "sha256:625242527cfec4291a2c89121604cffab23a3c6338b8c85415277b41d09cc174"
+    }
+  ]
+}
