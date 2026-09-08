@@ -60,11 +60,13 @@ def test_three_node_topology_replication_and_green_health(search_schema: SchemaD
         refresh_policy="wait_for",
     )
     assert result.outcome.value == "applied"
-    # Let OpenSearch converge for 30s and give the transport slightly longer to receive it.
+    # The probe validates global health, including asynchronously created system indices.
+    # Await the same global condition, not only this test's already-green business index.
     health = client.cluster.health(
-        index=index,
         wait_for_status="green",
         wait_for_no_relocating_shards=True,
+        wait_for_no_initializing_shards=True,
+        wait_for_nodes="3",
         timeout="30s",
         request_timeout=35,
     )
