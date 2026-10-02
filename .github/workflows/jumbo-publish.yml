@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # Member forwarder for jumbo publication (Jumbo Build & Versioning Standard,
 # section 3.5 "Executors and the Publication Contract"). This repository
 # carries NO release logic of its own; every release step (lock,
