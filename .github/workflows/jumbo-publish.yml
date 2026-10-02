@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: Apache-2.0
+# Member forwarder for jumbo publication (Jumbo Build & Versioning Standard,
+# section 3.5 "Executors and the Publication Contract"). This repository
+# carries NO release logic of its own; every release step (lock,
+# fingerprint, dedup, promote, publish on bump, index append, public
+# registry publication driven by the jumbo-computed version) is owned by
+# the reusable jumbo-publish workflow in zephytiju/JumboBuild. Pin note:
+# 87cc29d is the JumboBuild commit whose npm publication path runs the
+# standard build before npm pack (released artifacts carry dist) and whose
+# dependency materialization fetches private repositories with the org CI
+# app installation token (JumboBuild pull/42).
+name: jumbo publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: "Commit SHA of this repository to release (default: the triggering commit)"
+        type: string
+        default: ""
+
+jobs:
+  jumbo-publish:
+    uses: zephytiju/JumboBuild/.github/workflows/jumbo-publish.yml@87cc29db3b49b63b7874785c72257f3d66ca0c0d
+    secrets: inherit
+    with:
+      jumbobuild-ref: 87cc29db3b49b63b7874785c72257f3d66ca0c0d
+      commit: ${{ inputs.commit }}
+      # Public repository: also publish to the public registry (npm/PyPI)
+      # for external consumers, driven by the jumbo-computed version.
+      publish-to-public-registry: true
+    permissions:
+      contents: write
+      packages: write
