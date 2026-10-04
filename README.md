@@ -111,3 +111,21 @@ Licensed under the Apache License 2.0. See [LICENSE](LICENSE), [NOTICE](NOTICE),
 [SECURITY.md](SECURITY.md).
 
 See [release validation](docs/release-validation.md) for the gate inventory and verified combinations.
+
+## Build and release (Jumbo)
+
+This repository is jumbo-managed (Jumbo Build & Versioning Standard,
+section 3.5): resolution, builds, and releases run through jumbo, never
+ad-hoc pip/uv installs.
+
+```sh
+jumbo lock   # resolve internal packages from the JumboIndex, third-party from PyPI
+jumbo build  # build + tests at the resolved closure
+```
+
+The internal dependencies (`meridian-storage-core`, `meridian-storage-query`, `meridian-storage-semantics`) are resolved from the JumboIndex;
+the lock records the exact promoted build of each. Consumers likewise
+resolve this package (`meridian-storage-opensearch`) from the JumboIndex. Releases are dispatch-only through `.github/workflows/jumbo-publish.yml`;
+as a public package, external publication is driven by the jumbo-computed
+version, and every artifact's SHA-256 is recorded in the append-only
+JumboIndex.
