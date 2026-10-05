@@ -84,18 +84,39 @@ def test_machine_readable_conformance_vectors_match_the_public_contract() -> Non
     }
 
 
+def _declared_runtime_dependencies() -> dict[str, object]:
+    """The runtime dependency requirements declared in pyproject.toml."""
+    import tomllib
+
+    from packaging.requirements import Requirement
+
+    project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
+    return {Requirement(item).name: Requirement(item) for item in project["dependencies"]}
+
+
 def test_distribution_metadata_and_single_entry_point() -> None:
     distribution = metadata.distribution("meridian-storage-opensearch")
     assert distribution.version == "1.1.0"
     assert distribution.metadata["License-Expression"] == "Apache-2.0"
     assert distribution.requires is not None
+    from packaging.requirements import Requirement
+
     runtime = [item for item in distribution.requires if "extra ==" not in item]
-    assert runtime == [
-        "meridian-storage-core<2,>=1.1",
-        "meridian-storage-query<2,>=1.0.3",
-        "meridian-storage-semantics<3,>=2.0.1",
-        "opensearch-py<4,>=3.2",
-    ]
+    installed_by_name = {Requirement(item).name: item for item in runtime}
+    declared = _declared_runtime_dependencies()
+    assert set(installed_by_name) == set(declared), (
+        f"runtime requirements {sorted(installed_by_name)} must match the declared "
+        f"dependencies {sorted(declared)}"
+    )
+    for name, declared_requirement in declared.items():
+        # Internal (index-resolved) dependencies materialize at their
+        # resolved record version — the environment carries that exact
+        # pin, which must satisfy the declared major-only window.
+        # External dependencies carry their declared specifier verbatim.
+        assert metadata.version(name) in declared_requirement.specifier, (
+            f"{name}: installed '{installed_by_name[name]}' does not satisfy the "
+            f"declared '{declared_requirement}'"
+        )
     points = [
         item for item in distribution.entry_points if item.group == "meridian_storage.adapters"
     ]
