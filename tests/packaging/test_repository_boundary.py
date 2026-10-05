@@ -24,7 +24,13 @@ def test_required_apache_material_and_spdx_headers() -> None:
 
 
 def test_repository_contains_exactly_one_python_distribution() -> None:
-    pyprojects = [path for path in ROOT.rglob("pyproject.toml") if ".venv" not in path.parts]
+    # deps/ is the jumbo materialization overlay (recorded dependency
+    # source trees written by the build pipeline), not a repository
+    # source — the repository itself owns exactly one distribution.
+    excluded = {".venv", "deps"}
+    pyprojects = [
+        path for path in ROOT.rglob("pyproject.toml") if excluded.isdisjoint(path.parts)
+    ]
     assert pyprojects == [ROOT / "pyproject.toml"]
     source_packages = [
         path
