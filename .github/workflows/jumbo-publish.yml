@@ -1,17 +1,25 @@
 # SPDX-License-Identifier: Apache-2.0
-# Member forwarder for jumbo publication (Jumbo Build & Versioning Standard,
-# section 3.5 "Executors and the Publication Contract"). This repository
-# carries NO release logic of its own; every release step (lock,
-# fingerprint, dedup, promote, publish on bump, index append, public
-# registry publication driven by the jumbo-computed version) is owned by
-# the reusable jumbo-publish workflow in zephytiju/JumboBuild. Pin note:
-# 87cc29d is the JumboBuild commit whose npm publication path runs the
-# standard build before npm pack (released artifacts carry dist) and whose
-# dependency materialization fetches private repositories with the org CI
-# app installation token (JumboBuild pull/42).
-name: jumbo publish
+# Member forwarder for jumbo (Jumbo Build & Versioning Standard,
+# section 3.5 "Executors and the Publication Contract"). This is the
+# SINGLE workflow file the repository carries, with two modes:
+#   - pull_request / push to main calls the reusable jumbo-verify
+#     workflow: jumbo lock -> materialize the recorded dependency
+#     artifacts -> build -> test. No publication steps, read-only.
+#     Repository-specific checks live in the repository's own test
+#     surface (an npm verify script or a pytest test), where this
+#     pipeline runs them.
+#   - workflow_dispatch calls the reusable jumbo-publish workflow: the
+#     release path (lock, fingerprint, dedup, promote, publish on bump,
+#     index append), unchanged.
+# 1836120 is the JumboBuild commit that owns jumbo-verify (the
+# member PR-mode); every release step and every verify step is owned by
+# the reusable workflows in zephytiju/JumboBuild.
+name: jumbo
 
 on:
+  pull_request:
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       commit:
@@ -20,14 +28,24 @@ on:
         default: ""
 
 jobs:
-  jumbo-publish:
-    uses: zephytiju/JumboBuild/.github/workflows/jumbo-publish.yml@87cc29db3b49b63b7874785c72257f3d66ca0c0d
+  # PR-mode: verify every pull request (and pushes to main) through jumbo.
+  verify:
+    if: github.event_name != 'workflow_dispatch'
+    uses: zephytiju/JumboBuild/.github/workflows/jumbo-verify.yml@1836120955c121c11d63d9b9771c99a332f241c8
     secrets: inherit
     with:
-      jumbobuild-ref: 87cc29db3b49b63b7874785c72257f3d66ca0c0d
+      jumbobuild-ref: 1836120955c121c11d63d9b9771c99a332f241c8
+    permissions:
+      contents: read
+
+  # Dispatch-mode: the release path.
+  jumbo-publish:
+    if: github.event_name == 'workflow_dispatch'
+    uses: zephytiju/JumboBuild/.github/workflows/jumbo-publish.yml@1836120955c121c11d63d9b9771c99a332f241c8
+    secrets: inherit
+    with:
+      jumbobuild-ref: 1836120955c121c11d63d9b9771c99a332f241c8
       commit: ${{ inputs.commit }}
-      # Public repository: also publish to the public registry (npm/PyPI)
-      # for external consumers, driven by the jumbo-computed version.
       publish-to-public-registry: true
     permissions:
       contents: write
