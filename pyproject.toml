@@ -6,7 +6,10 @@ build-backend = "hatchling.build"
 
 [project]
 name = "meridian-storage-opensearch"
-dynamic = ["version"]
+# Static per the Jumbo standard (§3 manifest requirements): the major is
+# what the manifest declares; the pipeline owns minor/patch. The runtime
+# import keeps reading _version.py (kept in sync at 1.1.0).
+version = "1.1.0"
 description = "OpenSearch adapter for Meridian V1 multilingual search projections"
 readme = "README.md"
 requires-python = ">=3.12,<3.15"
@@ -53,9 +56,6 @@ opensearch = "meridian_storage.adapters.opensearch:OpenSearchAdapterFactory"
 Documentation = "https://github.com/zephytiju/MeridianOpenSearchAdapter#readme"
 Issues = "https://github.com/zephytiju/MeridianOpenSearchAdapter/issues"
 Repository = "https://github.com/zephytiju/MeridianOpenSearchAdapter"
-
-[tool.hatch.version]
-path = "src/meridian_storage/adapters/opensearch/_version.py"
 
 [tool.hatch.build.targets.sdist]
 include = [
