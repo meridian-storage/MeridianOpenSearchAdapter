@@ -11,7 +11,7 @@
 #   - workflow_dispatch calls the reusable jumbo-publish workflow: the
 #     release path (lock, fingerprint, dedup, promote, publish on bump,
 #     index append), unchanged.
-# 5787ce7 is the JumboBuild commit that owns jumbo-verify (the
+# 5e3215f is the JumboBuild commit that owns jumbo-verify (the
 # member PR-mode); every release step and every verify step is owned by
 # the reusable workflows in zephytiju/JumboBuild.
 name: jumbo
@@ -31,20 +31,20 @@ jobs:
   # PR-mode: verify every pull request (and pushes to main) through jumbo.
   verify:
     if: github.event_name != 'workflow_dispatch'
-    uses: zephytiju/JumboBuild/.github/workflows/jumbo-verify.yml@5787ce785627131e30b5efe0f533dd1ebd18fceb
+    uses: zephytiju/JumboBuild/.github/workflows/jumbo-verify.yml@5e3215f85d381e73863017eb331708998ce101c6
     secrets: inherit
     with:
-      jumbobuild-ref: 5787ce785627131e30b5efe0f533dd1ebd18fceb
+      jumbobuild-ref: 5e3215f85d381e73863017eb331708998ce101c6
     permissions:
       contents: read
 
   # Dispatch-mode: the release path.
   jumbo-publish:
     if: github.event_name == 'workflow_dispatch'
-    uses: zephytiju/JumboBuild/.github/workflows/jumbo-publish.yml@5787ce785627131e30b5efe0f533dd1ebd18fceb
+    uses: zephytiju/JumboBuild/.github/workflows/jumbo-publish.yml@5e3215f85d381e73863017eb331708998ce101c6
     secrets: inherit
     with:
-      jumbobuild-ref: 5787ce785627131e30b5efe0f533dd1ebd18fceb
+      jumbobuild-ref: 5e3215f85d381e73863017eb331708998ce101c6
       commit: ${{ inputs.commit }}
       publish-to-public-registry: true
     permissions:
